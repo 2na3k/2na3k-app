@@ -15,8 +15,8 @@ const ClassicMacDesktop: React.FC = () => {
       projects: { x: 150, y: 150 }
     },
     windowSizes: {
-      about: { width: 400, height: 300 },
-      projects: { width: 450, height: 350 }
+      about: { width: 500, height: 400 },
+      projects: { width: 550, height: 450 }
     },
     iconPositions: {
       about: { x: 50, y: 50 },
