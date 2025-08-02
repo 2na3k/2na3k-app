@@ -306,16 +306,6 @@ const ClassicMacDesktop: React.FC = () => {
             ? 'radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.3) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(147, 51, 234, 0.3) 0%, transparent 50%)'
             : 'radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.2) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)'
         }}
-        onClick={(e) => {
-          // Only handle clicks on the desktop background itself, not on windows or icons
-          if (e.target === e.currentTarget) {
-            // Clear focus when clicking on empty desktop area
-            setAppState(prev => ({
-              ...prev,
-              focusedWindow: null
-            }));
-          }
-        }}
       >
         {/* Menu Bar */}
         <div className="absolute top-0 left-0 right-0 h-6 bg-gray-200 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 flex items-center px-4 text-xs z-50">
