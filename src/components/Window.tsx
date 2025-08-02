@@ -7,6 +7,8 @@ const DesktopWindow: React.FC<WindowProps> = ({
   children,
   isOpen,
   isFocused,
+  isDragging,
+  isResizing,
   onClose,
   onFocus,
   position,
@@ -18,7 +20,7 @@ const DesktopWindow: React.FC<WindowProps> = ({
 
   return (
     <div
-      className={`absolute bg-gray-100 dark:bg-gray-800 border-2 rounded-xl window-shadow transition-all duration-200 ${
+      className={`absolute bg-gray-100 dark:bg-gray-800 border-2 rounded-xl window-shadow ${!(isDragging || isResizing) ? 'transition-all duration-200' : ''} ${
         isFocused 
           ? 'border-blue-500 dark:border-blue-400 shadow-lg' 
           : 'border-gray-400 dark:border-gray-600 filter grayscale'

@@ -6,6 +6,8 @@ export interface WindowProps {
   children: React.ReactNode;
   isOpen: boolean;
   isFocused: boolean;
+  isDragging: boolean;
+  isResizing: boolean;
   onClose: () => void;
   onFocus: () => void;
   position: { x: number; y: number };
@@ -41,6 +43,7 @@ export interface DragState {
   offset: { x: number; y: number };
   startPos: { x: number; y: number };
   startSize: { width: number; height: number } | null;
+  startWindowPos?: { x: number; y: number };
 }
 
 export interface DesktopIcon {

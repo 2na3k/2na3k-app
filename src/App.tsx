@@ -348,6 +348,8 @@ const ClassicMacDesktop: React.FC = () => {
           title="About This Mac"
           isOpen={appState.openWindows.has('about')}
           isFocused={appState.focusedWindow === 'about'}
+          isDragging={dragState.isDragging && dragState.itemId === 'about'}
+          isResizing={dragState.isResizing && dragState.itemId === 'about'}
           onClose={() => closeWindow('about')}
           onFocus={() => focusWindow('about')}
           position={appState.windowPositions.about}
@@ -363,6 +365,8 @@ const ClassicMacDesktop: React.FC = () => {
           title="Projects"
           isOpen={appState.openWindows.has('projects')}
           isFocused={appState.focusedWindow === 'projects'}
+          isDragging={dragState.isDragging && dragState.itemId === 'projects'}
+          isResizing={dragState.isResizing && dragState.itemId === 'projects'}
           onClose={() => closeWindow('projects')}
           onFocus={() => focusWindow('projects')}
           position={appState.windowPositions.projects}
