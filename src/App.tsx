@@ -68,14 +68,6 @@ const ClassicMacDesktop: React.FC = () => {
     }));
   };
 
-  const minimizeWindow = (windowId: string) => {
-    closeWindow(windowId);
-  };
-
-  const toggleTheme = () => {
-    setAppState(prev => ({ ...prev, isDarkMode: !prev.isDarkMode }));
-  };
-
   const focusWindow = (windowId: string) => {
     setAppState(prev => ({
       ...prev,
@@ -88,7 +80,7 @@ const ClassicMacDesktop: React.FC = () => {
     // Focus the window when starting to drag
     focusWindow(windowId);
     
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const currentPosition = appState.windowPositions[windowId];
     setDragState({
       isDragging: true,
       isResizing: false,
@@ -96,8 +88,8 @@ const ClassicMacDesktop: React.FC = () => {
       itemType: 'window',
       resizeDirection: null,
       offset: {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
+        x: e.clientX - currentPosition.x,
+        y: e.clientY - currentPosition.y
       },
       startPos: {
         x: e.clientX,
@@ -134,7 +126,6 @@ const ClassicMacDesktop: React.FC = () => {
     // Focus the window when starting to resize
     focusWindow(windowId);
     
-    console.log('Resize started:', windowId, direction); // Debug log
     setDragState({
       isDragging: false,
       isResizing: true,
@@ -153,39 +144,42 @@ const ClassicMacDesktop: React.FC = () => {
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (dragState.itemId && desktopRef.current) {
-        // Check if we should start dragging (moved more than 5px)
+        // Check if we should start dragging (moved more than 3px for smoother start)
         if (!dragState.isDragging && !dragState.isResizing && dragState.itemType === 'icon') {
           const distance = Math.sqrt(
             Math.pow(e.clientX - dragState.startPos.x, 2) + 
             Math.pow(e.clientY - dragState.startPos.y, 2)
           );
-          if (distance > 5) {
+          if (distance > 3) {
             setDragState(prev => ({ ...prev, isDragging: true }));
           }
         }
 
-        // Handle window dragging
+        // Handle window dragging with improved performance
         if (dragState.isDragging && dragState.itemType === 'window') {
           const desktopRect = desktopRef.current.getBoundingClientRect();
           const newX = Math.max(0, Math.min(
-            e.clientX - desktopRect.left - dragState.offset.x,
-            desktopRect.width - 320
+            e.clientX - dragState.offset.x,
+            desktopRect.width - appState.windowSizes[dragState.itemId!].width
           ));
           const newY = Math.max(24, Math.min( // Account for menu bar
-            e.clientY - desktopRect.top - dragState.offset.y,
-            desktopRect.height - 232 // Account for taskbar
+            e.clientY - dragState.offset.y,
+            desktopRect.height - appState.windowSizes[dragState.itemId!].height
           ));
 
-          setAppState(prev => ({
-            ...prev,
-            windowPositions: {
-              ...prev.windowPositions,
-              [dragState.itemId!]: { x: newX, y: newY }
-            }
-          }));
+          // Use requestAnimationFrame for smoother updates
+          requestAnimationFrame(() => {
+            setAppState(prev => ({
+              ...prev,
+              windowPositions: {
+                ...prev.windowPositions,
+                [dragState.itemId!]: { x: newX, y: newY }
+              }
+            }));
+          });
         }
         
-        // Handle icon dragging
+        // Handle icon dragging with improved performance
         else if (dragState.isDragging && dragState.itemType === 'icon') {
           const desktopRect = desktopRef.current.getBoundingClientRect();
           const newX = Math.max(0, Math.min(
@@ -194,77 +188,91 @@ const ClassicMacDesktop: React.FC = () => {
           ));
           const newY = Math.max(24, Math.min( // Account for menu bar
             e.clientY - desktopRect.top - dragState.offset.y,
-            desktopRect.height - 120 // Account for taskbar and icon height
+            desktopRect.height - 100 // Account for icon height and margin
           ));
 
-          setAppState(prev => ({
-            ...prev,
-            iconPositions: {
-              ...prev.iconPositions,
-              [dragState.itemId!]: { x: newX, y: newY }
-            }
-          }));
+          // Use requestAnimationFrame for smoother updates
+          requestAnimationFrame(() => {
+            setAppState(prev => ({
+              ...prev,
+              iconPositions: {
+                ...prev.iconPositions,
+                [dragState.itemId!]: { x: newX, y: newY }
+              }
+            }));
+          });
         }
         
         // Handle window resizing
         else if (dragState.isResizing && dragState.itemType === 'window' && dragState.startSize) {
-          console.log('Resizing window:', dragState.itemId, dragState.resizeDirection); // Debug log
           const desktopRect = desktopRef.current.getBoundingClientRect();
-          const deltaX = e.clientX - dragState.startPos.x;
-          const deltaY = e.clientY - dragState.startPos.y;
           
-          let newWidth = dragState.startSize.width;
-          let newHeight = dragState.startSize.height;
-          let newX = appState.windowPositions[dragState.itemId!].x;
-          let newY = appState.windowPositions[dragState.itemId!].y;
+          const originalPos = appState.windowPositions[dragState.itemId!];
+          const originalSize = dragState.startSize;
+          
+          let newX = originalPos.x;
+          let newY = originalPos.y;
+          let newWidth = originalSize.width;
+          let newHeight = originalSize.height;
           
           const direction = dragState.resizeDirection;
-          const currentPos = appState.windowPositions[dragState.itemId!];
-          
-          // Handle horizontal resizing
+          const minWidth = 320;
+          const minHeight = 200;
+          const topBarHeight = 24;
+
+          // Use mouse position directly, but clamp it to the desktop boundaries
+          const mouseX = Math.max(0, Math.min(e.clientX, desktopRect.width));
+          const mouseY = Math.max(topBarHeight, Math.min(e.clientY, desktopRect.height));
+
+          const rightEdge = originalPos.x + originalSize.width;
+          const bottomEdge = originalPos.y + originalSize.height;
+
           if (direction?.includes('e')) {
-            newWidth = Math.max(320, Math.min(
-              dragState.startSize.width + deltaX,
-              desktopRect.width - currentPos.x - 20 // Leave some margin
-            ));
+            newWidth = Math.max(minWidth, mouseX - originalPos.x);
           }
           if (direction?.includes('w')) {
-            const maxDeltaX = currentPos.x - 20; // Leave some margin from left edge
-            const actualDeltaX = Math.min(deltaX, maxDeltaX);
-            newWidth = Math.max(320, dragState.startSize.width - actualDeltaX);
-            newX = currentPos.x + actualDeltaX;
+            newX = mouseX;
+            newWidth = rightEdge - mouseX;
+            if (newWidth < minWidth) {
+              newWidth = minWidth;
+              newX = rightEdge - minWidth;
+            }
           }
-          
-          // Handle vertical resizing
           if (direction?.includes('s')) {
-            newHeight = Math.max(200, Math.min(
-              dragState.startSize.height + deltaY,
-              desktopRect.height - currentPos.y - 40 // Account for taskbar and margin
-            ));
+            newHeight = Math.max(minHeight, mouseY - originalPos.y);
           }
           if (direction?.includes('n')) {
-            const maxDeltaY = currentPos.y - 40; // Account for menu bar and margin
-            const actualDeltaY = Math.min(deltaY, maxDeltaY);
-            newHeight = Math.max(200, dragState.startSize.height - actualDeltaY);
-            newY = currentPos.y + actualDeltaY;
-          }
-          
-          setAppState(prev => ({
-            ...prev,
-            windowPositions: {
-              ...prev.windowPositions,
-              [dragState.itemId!]: { x: newX, y: newY }
-            },
-            windowSizes: {
-              ...prev.windowSizes,
-              [dragState.itemId!]: { width: newWidth, height: newHeight }
+            newY = mouseY;
+            newHeight = bottomEdge - mouseY;
+            if (newHeight < minHeight) {
+              newHeight = minHeight;
+              newY = bottomEdge - minHeight;
             }
-          }));
+          }
+
+          requestAnimationFrame(() => {
+            setAppState(prev => ({
+              ...prev,
+              windowPositions: {
+                ...prev.windowPositions,
+                [dragState.itemId!]: { x: newX, y: newY }
+              },
+              windowSizes: {
+                ...prev.windowSizes,
+                [dragState.itemId!]: { width: newWidth, height: newHeight }
+              }
+            }));
+          });
         }
       }
     };
 
     const handleMouseUp = () => {
+      // If we finished an action on an icon without actually dragging it, treat it as a click.
+      if (dragState.itemType === 'icon' && !dragState.isDragging && dragState.itemId) {
+        openWindow(dragState.itemId);
+      }
+
       setDragState({ 
         isDragging: false,
         isResizing: false,
@@ -298,6 +306,16 @@ const ClassicMacDesktop: React.FC = () => {
             ? 'radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.3) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(147, 51, 234, 0.3) 0%, transparent 50%)'
             : 'radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.2) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)'
         }}
+        onClick={(e) => {
+          // Only handle clicks on the desktop background itself, not on windows or icons
+          if (e.target === e.currentTarget) {
+            // Clear focus when clicking on empty desktop area
+            setAppState(prev => ({
+              ...prev,
+              focusedWindow: null
+            }));
+          }
+        }}
       >
         {/* Menu Bar */}
         <div className="absolute top-0 left-0 right-0 h-6 bg-gray-200 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 flex items-center px-4 text-xs z-50">
@@ -305,14 +323,8 @@ const ClassicMacDesktop: React.FC = () => {
             <span className="font-bold">🍎</span>
             <span className="text-gray-700 dark:text-gray-300">Classic Mac OS</span>
           </div>
-          <div className="ml-auto">
-            <button
-              onClick={toggleTheme}
-              className="text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600 px-2 py-1 rounded transition-colors"
-              aria-label={`Switch to ${appState.isDarkMode ? 'light' : 'dark'} mode`}
-            >
-              {appState.isDarkMode ? '☀️' : '🌙'}
-            </button>
+          <div className="ml-auto text-gray-600 dark:text-gray-400">
+            {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </div>
         </div>
 
@@ -324,7 +336,6 @@ const ClassicMacDesktop: React.FC = () => {
               id={icon.id}
               title={icon.title}
               icon={icon.icon}
-              onClick={() => openWindow(icon.id)}
               position={appState.iconPositions[icon.id]}
               onDragStart={(e) => handleIconDragStart(icon.id, e)}
             />
@@ -338,7 +349,6 @@ const ClassicMacDesktop: React.FC = () => {
           isOpen={appState.openWindows.has('about')}
           isFocused={appState.focusedWindow === 'about'}
           onClose={() => closeWindow('about')}
-          onMinimize={() => minimizeWindow('about')}
           onFocus={() => focusWindow('about')}
           position={appState.windowPositions.about}
           size={appState.windowSizes.about}
@@ -354,7 +364,6 @@ const ClassicMacDesktop: React.FC = () => {
           isOpen={appState.openWindows.has('projects')}
           isFocused={appState.focusedWindow === 'projects'}
           onClose={() => closeWindow('projects')}
-          onMinimize={() => minimizeWindow('projects')}
           onFocus={() => focusWindow('projects')}
           position={appState.windowPositions.projects}
           size={appState.windowSizes.projects}
@@ -364,30 +373,10 @@ const ClassicMacDesktop: React.FC = () => {
           <ProjectsContent />
         </DesktopWindow>
 
-        {/* Taskbar */}
-        <div className="absolute bottom-0 left-0 right-0 h-8 bg-gray-200 dark:bg-gray-800 border-t border-gray-300 dark:border-gray-700 flex items-center px-4 z-50">
-          <div className="flex items-center space-x-2">
-            {Array.from(appState.openWindows).map(windowId => (
-              <button
-                key={windowId}
-                onClick={() => focusWindow(windowId)}
-                className={`text-xs px-3 py-1 rounded border transition-colors capitalize ${
-                  appState.focusedWindow === windowId
-                    ? 'bg-blue-500 text-white border-blue-600'
-                    : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300 border-gray-400 dark:border-gray-500 hover:bg-gray-400 dark:hover:bg-gray-500'
-                }`}
-              >
-                {windowId}
-              </button>
-            ))}
-          </div>
-          <div className="ml-auto text-xs text-gray-600 dark:text-gray-400">
-            {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </div>
-        </div>
+
       </div>
     </div>
   );
 };
 
-export default ClassicMacDesktop; 
+export default ClassicMacDesktop;

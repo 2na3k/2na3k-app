@@ -7,7 +7,6 @@ export interface WindowProps {
   isOpen: boolean;
   isFocused: boolean;
   onClose: () => void;
-  onMinimize: () => void;
   onFocus: () => void;
   position: { x: number; y: number };
   size: { width: number; height: number };
@@ -19,7 +18,7 @@ export interface DesktopIconProps {
   id: string;
   title: string;
   icon: React.ReactNode;
-  onClick: () => void;
+  onClick?: () => void;
   position: { x: number; y: number };
   onDragStart: (_e: React.MouseEvent) => void;
 }
@@ -48,4 +47,4 @@ export interface DesktopIcon {
   id: string;
   title: string;
   icon: React.ReactNode;
-} 
+}

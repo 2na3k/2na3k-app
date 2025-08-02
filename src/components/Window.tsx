@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Minus } from 'lucide-react';
+import { X } from 'lucide-react';
 import { WindowProps } from '../types';
 
 const DesktopWindow: React.FC<WindowProps> = ({
@@ -8,7 +8,6 @@ const DesktopWindow: React.FC<WindowProps> = ({
   isOpen,
   isFocused,
   onClose,
-  onMinimize,
   onFocus,
   position,
   size,
@@ -19,19 +18,19 @@ const DesktopWindow: React.FC<WindowProps> = ({
 
   return (
     <div
-      className={`absolute bg-gray-100 dark:bg-gray-800 border-2 rounded-lg window-shadow transition-all duration-200 ${
+      className={`absolute bg-gray-100 dark:bg-gray-800 border-2 rounded-xl window-shadow transition-colors duration-200 ${
         isFocused 
           ? 'border-blue-500 dark:border-blue-400 shadow-lg' 
           : 'border-gray-400 dark:border-gray-600'
       }`}
       style={{ 
-        left: position.x, 
-        top: position.y,
         width: size.width,
         height: size.height,
         minWidth: 320,
         minHeight: 200,
-        zIndex: isFocused ? 100 : 10
+        zIndex: isFocused ? 100 : 10,
+        willChange: 'transform',
+        transform: `translate(${position.x}px, ${position.y}px)`
       }}
       onClick={onFocus}
     >
@@ -45,12 +44,6 @@ const DesktopWindow: React.FC<WindowProps> = ({
       >
         <h3 className="text-sm font-medium">{title}</h3>
         <div className="flex space-x-2">
-          <button
-            onClick={onMinimize}
-            className="w-4 h-4 bg-yellow-400 hover:bg-yellow-500 rounded-full flex items-center justify-center transition-colors"
-          >
-            <Minus size={8} className="text-yellow-800" />
-          </button>
           <button
             onClick={onClose}
             className="w-4 h-4 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors"
@@ -73,77 +66,63 @@ const DesktopWindow: React.FC<WindowProps> = ({
 
       {/* Resize Handles */}
       <div
-        className="absolute bottom-0 right-0 w-6 h-6 cursor-se-resize hover:bg-blue-200 dark:hover:bg-blue-700 opacity-30 hover:opacity-100 transition-opacity z-10"
-        onMouseDown={(e) => {
-          e.stopPropagation();
-          onResizeStart(e, 'se');
-        }}
-        style={{
-          background: 'linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.3) 50%)'
-        }}
-      />
-      <div
-        className="absolute bottom-0 left-0 w-6 h-6 cursor-sw-resize hover:bg-blue-200 dark:hover:bg-blue-700 opacity-30 hover:opacity-100 transition-opacity z-10"
-        onMouseDown={(e) => {
-          e.stopPropagation();
-          onResizeStart(e, 'sw');
-        }}
-        style={{
-          background: 'linear-gradient(225deg, transparent 50%, rgba(0,0,0,0.3) 50%)'
-        }}
-      />
-      <div
-        className="absolute top-8 right-0 w-6 h-6 cursor-ne-resize hover:bg-blue-200 dark:hover:bg-blue-700 opacity-30 hover:opacity-100 transition-opacity z-10"
-        onMouseDown={(e) => {
-          e.stopPropagation();
-          onResizeStart(e, 'ne');
-        }}
-        style={{
-          background: 'linear-gradient(45deg, transparent 50%, rgba(0,0,0,0.3) 50%)'
-        }}
-      />
-      <div
-        className="absolute top-8 left-0 w-6 h-6 cursor-nw-resize hover:bg-blue-200 dark:hover:bg-blue-700 opacity-30 hover:opacity-100 transition-opacity z-10"
+        className="absolute -top-1 -left-1 w-8 h-8 cursor-nw-resize z-10"
         onMouseDown={(e) => {
           e.stopPropagation();
           onResizeStart(e, 'nw');
         }}
-        style={{
-          background: 'linear-gradient(315deg, transparent 50%, rgba(0,0,0,0.3) 50%)'
-        }}
       />
-      
-      {/* Edge resize handles */}
       <div
-        className="absolute bottom-0 left-4 right-4 h-3 cursor-s-resize hover:bg-blue-200 dark:hover:bg-blue-700 opacity-20 hover:opacity-100 transition-opacity z-10"
+        className="absolute -top-1 -right-1 w-8 h-8 cursor-ne-resize z-10"
         onMouseDown={(e) => {
           e.stopPropagation();
-          onResizeStart(e, 's');
+          onResizeStart(e, 'ne');
         }}
       />
       <div
-        className="absolute top-8 left-4 right-4 h-3 cursor-n-resize hover:bg-blue-200 dark:hover:bg-blue-700 opacity-20 hover:opacity-100 transition-opacity z-10"
+        className="absolute -bottom-1 -left-1 w-8 h-8 cursor-sw-resize z-10"
         onMouseDown={(e) => {
           e.stopPropagation();
-          onResizeStart(e, 'n');
+          onResizeStart(e, 'sw');
         }}
       />
       <div
-        className="absolute left-0 top-8 bottom-0 w-3 cursor-w-resize hover:bg-blue-200 dark:hover:bg-blue-700 opacity-20 hover:opacity-100 transition-opacity z-10"
+        className="absolute -bottom-1 -right-1 w-8 h-8 cursor-se-resize z-10"
+        onMouseDown={(e) => {
+          e.stopPropagation();
+          onResizeStart(e, 'se');
+        }}
+      />
+      <div
+        className="absolute top-1/2 -translate-y-1/2 -left-1 w-8 h-full cursor-w-resize z-20"
         onMouseDown={(e) => {
           e.stopPropagation();
           onResizeStart(e, 'w');
         }}
       />
       <div
-        className="absolute right-0 top-8 bottom-0 w-3 cursor-e-resize hover:bg-blue-200 dark:hover:bg-blue-700 opacity-20 hover:opacity-100 transition-opacity z-10"
+        className="absolute top-1/2 -translate-y-1/2 -right-1 w-8 h-full cursor-e-resize z-20"
         onMouseDown={(e) => {
           e.stopPropagation();
           onResizeStart(e, 'e');
+        }}
+      />
+      <div
+        className="absolute left-1/2 -translate-x-1/2 -top-1 w-full h-2 cursor-n-resize z-20"
+        onMouseDown={(e) => {
+          e.stopPropagation();
+          onResizeStart(e, 'n');
+        }}
+      />
+      <div
+        className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-full h-8 cursor-s-resize z-20"
+        onMouseDown={(e) => {
+          e.stopPropagation();
+          onResizeStart(e, 's');
         }}
       />
     </div>
   );
 };
 
-export default DesktopWindow; 
+export default DesktopWindow;
