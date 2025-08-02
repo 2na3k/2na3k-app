@@ -8,7 +8,7 @@ const AboutContent: React.FC = () => (
         <User size={32} className="text-white" />
       </div>
       <div>
-        <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200">Chi Thanh Le (as 2na3k)</h2>
+        <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200">Chi Thanh Le (as @2na3k)</h2>
         <p className="text-sm text-gray-600 dark:text-gray-400">Version beta 1.0.1</p>
       </div>
     </div>
