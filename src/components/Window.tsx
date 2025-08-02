@@ -18,10 +18,10 @@ const DesktopWindow: React.FC<WindowProps> = ({
 
   return (
     <div
-      className={`absolute bg-gray-100 dark:bg-gray-800 border-2 rounded-xl window-shadow transition-colors duration-200 ${
+      className={`absolute bg-gray-100 dark:bg-gray-800 border-2 rounded-xl window-shadow transition-all duration-200 ${
         isFocused 
           ? 'border-blue-500 dark:border-blue-400 shadow-lg' 
-          : 'border-gray-400 dark:border-gray-600'
+          : 'border-gray-400 dark:border-gray-600 filter grayscale'
       }`}
       style={{ 
         width: size.width,
@@ -36,7 +36,11 @@ const DesktopWindow: React.FC<WindowProps> = ({
     >
       {/* Title Bar */}
       <div
-        className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white px-4 py-2 rounded-t-md cursor-move flex justify-between items-center"
+        className={`px-4 py-2 rounded-t-md cursor-move flex justify-between items-center transition-colors duration-200 ${
+          isFocused
+            ? 'bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white'
+            : 'bg-gradient-to-r from-gray-400 to-gray-500 dark:from-gray-500 dark:to-gray-600 text-gray-800 dark:text-gray-300'
+        }`}
         onMouseDown={(e) => {
           e.stopPropagation();
           onDragStart(e);
