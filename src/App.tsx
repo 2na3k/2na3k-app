@@ -44,6 +44,23 @@ const ClassicMacDesktop: React.FC = () => {
     dragStateRef.current = dragState;
   }, [dragState]);
 
+  useEffect(() => {
+    if (desktopRef.current) {
+      const desktopWidth = desktopRef.current.clientWidth;
+      const iconWidth = 80;
+      const paddingRight = 20;
+      const newX = desktopWidth - iconWidth - paddingRight;
+      
+      setAppState(prev => ({
+        ...prev,
+        iconPositions: {
+          about: { x: newX, y: 50 },
+          projects: { x: newX, y: 150 }
+        }
+      }));
+    }
+  }, []);
+
   // Desktop icons configuration
   const desktopIcons: DesktopIconType[] = [
     {
