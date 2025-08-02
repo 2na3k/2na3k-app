@@ -33,7 +33,8 @@ const ClassicMacDesktop: React.FC = () => {
     resizeDirection: null,
     offset: { x: 0, y: 0 },
     startPos: { x: 0, y: 0 },
-    startSize: null
+    startSize: null,
+    startWindowPos: { x: 0, y: 0 }
   });
 
   const desktopRef = useRef<HTMLDivElement>(null);
@@ -137,13 +138,15 @@ const ClassicMacDesktop: React.FC = () => {
         x: e.clientX,
         y: e.clientY
       },
-      startSize: appState.windowSizes[windowId]
+      startSize: appState.windowSizes[windowId],
+      startWindowPos: appState.windowPositions[windowId]
     });
   };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (dragState.itemId && desktopRef.current) {
+        const desktopRect = desktopRef.current.getBoundingClientRect();
         // Check if we should start dragging (moved more than 3px for smoother start)
         if (!dragState.isDragging && !dragState.isResizing && dragState.itemType === 'icon') {
           const distance = Math.sqrt(
@@ -157,7 +160,6 @@ const ClassicMacDesktop: React.FC = () => {
 
         // Handle window dragging with improved performance
         if (dragState.isDragging && dragState.itemType === 'window') {
-          const desktopRect = desktopRef.current.getBoundingClientRect();
           const newX = Math.max(0, Math.min(
             e.clientX - dragState.offset.x,
             desktopRect.width - appState.windowSizes[dragState.itemId!].width
@@ -181,7 +183,6 @@ const ClassicMacDesktop: React.FC = () => {
         
         // Handle icon dragging with improved performance
         else if (dragState.isDragging && dragState.itemType === 'icon') {
-          const desktopRect = desktopRef.current.getBoundingClientRect();
           const newX = Math.max(0, Math.min(
             e.clientX - desktopRect.left - dragState.offset.x,
             desktopRect.width - 80 // Icon width
@@ -204,10 +205,8 @@ const ClassicMacDesktop: React.FC = () => {
         }
         
         // Handle window resizing
-        else if (dragState.isResizing && dragState.itemType === 'window' && dragState.startSize) {
-          const desktopRect = desktopRef.current.getBoundingClientRect();
-          
-          const originalPos = appState.windowPositions[dragState.itemId!];
+        else if (dragState.isResizing && dragState.itemType === 'window' && dragState.startSize && dragState.startWindowPos) {
+          const originalPos = dragState.startWindowPos;
           const originalSize = dragState.startSize;
           
           let newX = originalPos.x;
@@ -281,7 +280,8 @@ const ClassicMacDesktop: React.FC = () => {
         resizeDirection: null,
         offset: { x: 0, y: 0 },
         startPos: { x: 0, y: 0 },
-        startSize: null
+        startSize: null,
+        startWindowPos: { x: 0, y: 0 }
       });
     };
 
@@ -294,7 +294,7 @@ const ClassicMacDesktop: React.FC = () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [dragState, appState.windowPositions]);
+  }, [dragState]);
 
   return (
     <div className={appState.isDarkMode ? 'dark' : ''}>
