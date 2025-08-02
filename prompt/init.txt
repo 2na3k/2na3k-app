@@ -1,0 +1,39 @@
+Generate a project using the following project specification:
+<project-specification>
+<app-overview>  
+I need a webapp that have the screen like a desktop screen, and several icons like folder on the screen in the style of Apple in 90s. When click onto that, it would pop up to several another application. 
+</app-overview>
+<features>  
+The webapp will contains of 3 pages:
+- The webapp will look like a desktop of an Mac in 90s
+- The desktop will have 2 icons: about, project
+- When clicking onto the icons, it will pop up above a small window to show the information on the screen
+- When clicking onto the about folder, it will pop up some information
+- when clicking onto the project folder, it will pop up some information
+</features>
+<context>  
+<tech-stack>  
+- Use Vite as the bundler.
+- Use TypeScript as the programming language and define types and interfaces.
+- Use React as the frontend framework.
+- Use Tailwind CSS for custom styling.
+- Leverage existing npm packages where applicable to avoid reinventing the wheel.
+</tech-stack>
+<ui>  
+- Emphasize bold simplicity with a clean, uncluttered design.
+- Use strategic color accents to establish visual hierarchy and highlight calls to action.
+- Define and systematically apply a brand color palette (e.g., primary, secondary, accent colors).
+- Provide a switchable light and dark mode with seamless theme toggling.
+- Ensure accessibility with high contrast ratios and ARIA labels for screen readers.  
+</ui>
+<role>  
+- Act as a senior software development architect, designing a robust, scalable, and maintainable application structure.  
+</role>
+<guidelines> 
+- Adhere to SOLID principles (Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion).
+- Follow clean code practices, including meaningful naming, modular design, and minimal code duplication.
+- Optimize for performance and maintainability throughout the codebase.  
+- After making changes, please append the changes into a file CHANGELOG.md for changes you made.
+</guidelines>
+</context>
+</project-specification>
