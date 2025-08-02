@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { User, FolderOpen } from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import folderIcon from './static/icons/folder.png';
 import DesktopIcon from './components/DesktopIcon';
 import DesktopWindow from './components/Window';
 import AboutContent from './components/AboutContent';
@@ -38,18 +38,23 @@ const ClassicMacDesktop: React.FC = () => {
   });
 
   const desktopRef = useRef<HTMLDivElement>(null);
+  const mousePosRef = useRef({ x: 0, y: 0 });
+  const dragStateRef = useRef(dragState);
+  useEffect(() => {
+    dragStateRef.current = dragState;
+  }, [dragState]);
 
   // Desktop icons configuration
   const desktopIcons: DesktopIconType[] = [
     {
       id: 'about',
       title: 'About',
-      icon: <User size={24} />
+      icon: <img src={folderIcon} alt="About" className="w-12 h-12 object-contain" />
     },
     {
       id: 'projects',
       title: 'Projects',
-      icon: <FolderOpen size={24} />
+      icon: <img src={folderIcon} alt="Projects" className="w-12 h-12 object-contain" />
     }
   ];
 
@@ -104,7 +109,7 @@ const ClassicMacDesktop: React.FC = () => {
   const handleIconDragStart = (iconId: string, e: React.MouseEvent) => {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     setDragState({
-      isDragging: false, // Will be set to true when mouse moves enough
+      isDragging: true, // Set to true immediately
       isResizing: false,
       itemId: iconId,
       itemType: 'icon',
@@ -143,158 +148,127 @@ const ClassicMacDesktop: React.FC = () => {
     });
   };
 
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (dragState.itemId && desktopRef.current) {
-        const desktopRect = desktopRef.current.getBoundingClientRect();
-        // Check if we should start dragging (moved more than 3px for smoother start)
-        if (!dragState.isDragging && !dragState.isResizing && dragState.itemType === 'icon') {
-          const distance = Math.sqrt(
-            Math.pow(e.clientX - dragState.startPos.x, 2) + 
-            Math.pow(e.clientY - dragState.startPos.y, 2)
-          );
-          if (distance > 3) {
-            setDragState(prev => ({ ...prev, isDragging: true }));
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    mousePosRef.current = { x: e.clientX, y: e.clientY };
+    const currentDragState = dragStateRef.current;
+    if (!currentDragState.itemId || !desktopRef.current) return;
+
+    const desktopRect = desktopRef.current.getBoundingClientRect();
+    
+    if (currentDragState.isDragging && currentDragState.itemType === 'window') {
+      const newX = Math.max(0, Math.min(
+        e.clientX - currentDragState.offset.x,
+        desktopRect.width - appState.windowSizes[currentDragState.itemId!].width
+      ));
+      const newY = Math.max(24, Math.min(
+        e.clientY - currentDragState.offset.y,
+        desktopRect.height - appState.windowSizes[currentDragState.itemId!].height
+      ));
+      requestAnimationFrame(() => {
+        setAppState(prev => ({
+          ...prev,
+          windowPositions: {
+            ...prev.windowPositions,
+            [currentDragState.itemId!]: { x: newX, y: newY }
           }
-        }
-
-        // Handle window dragging with improved performance
-        if (dragState.isDragging && dragState.itemType === 'window') {
-          const newX = Math.max(0, Math.min(
-            e.clientX - dragState.offset.x,
-            desktopRect.width - appState.windowSizes[dragState.itemId!].width
-          ));
-          const newY = Math.max(24, Math.min( // Account for menu bar
-            e.clientY - dragState.offset.y,
-            desktopRect.height - appState.windowSizes[dragState.itemId!].height
-          ));
-
-          // Use requestAnimationFrame for smoother updates
-          requestAnimationFrame(() => {
-            setAppState(prev => ({
-              ...prev,
-              windowPositions: {
-                ...prev.windowPositions,
-                [dragState.itemId!]: { x: newX, y: newY }
-              }
-            }));
-          });
-        }
-        
-        // Handle icon dragging with improved performance
-        else if (dragState.isDragging && dragState.itemType === 'icon') {
-          const newX = Math.max(0, Math.min(
-            e.clientX - desktopRect.left - dragState.offset.x,
-            desktopRect.width - 80 // Icon width
-          ));
-          const newY = Math.max(24, Math.min( // Account for menu bar
-            e.clientY - desktopRect.top - dragState.offset.y,
-            desktopRect.height - 100 // Account for icon height and margin
-          ));
-
-          // Use requestAnimationFrame for smoother updates
-          requestAnimationFrame(() => {
-            setAppState(prev => ({
-              ...prev,
-              iconPositions: {
-                ...prev.iconPositions,
-                [dragState.itemId!]: { x: newX, y: newY }
-              }
-            }));
-          });
-        }
-        
-        // Handle window resizing
-        else if (dragState.isResizing && dragState.itemType === 'window' && dragState.startSize && dragState.startWindowPos) {
-          const originalPos = dragState.startWindowPos;
-          const originalSize = dragState.startSize;
-          
-          let newX = originalPos.x;
-          let newY = originalPos.y;
-          let newWidth = originalSize.width;
-          let newHeight = originalSize.height;
-          
-          const direction = dragState.resizeDirection;
-          const minWidth = 320;
-          const minHeight = 200;
-          const topBarHeight = 24;
-
-          // Use mouse position directly, but clamp it to the desktop boundaries
-          const mouseX = Math.max(0, Math.min(e.clientX, desktopRect.width));
-          const mouseY = Math.max(topBarHeight, Math.min(e.clientY, desktopRect.height));
-
-          const rightEdge = originalPos.x + originalSize.width;
-          const bottomEdge = originalPos.y + originalSize.height;
-
-          if (direction?.includes('e')) {
-            newWidth = Math.max(minWidth, mouseX - originalPos.x);
-          }
-          if (direction?.includes('w')) {
-            newX = mouseX;
-            newWidth = rightEdge - mouseX;
-            if (newWidth < minWidth) {
-              newWidth = minWidth;
-              newX = rightEdge - minWidth;
-            }
-          }
-          if (direction?.includes('s')) {
-            newHeight = Math.max(minHeight, mouseY - originalPos.y);
-          }
-          if (direction?.includes('n')) {
-            newY = mouseY;
-            newHeight = bottomEdge - mouseY;
-            if (newHeight < minHeight) {
-              newHeight = minHeight;
-              newY = bottomEdge - minHeight;
-            }
-          }
-
-          requestAnimationFrame(() => {
-            setAppState(prev => ({
-              ...prev,
-              windowPositions: {
-                ...prev.windowPositions,
-                [dragState.itemId!]: { x: newX, y: newY }
-              },
-              windowSizes: {
-                ...prev.windowSizes,
-                [dragState.itemId!]: { width: newWidth, height: newHeight }
-              }
-            }));
-          });
-        }
-      }
-    };
-
-    const handleMouseUp = () => {
-      // If we finished an action on an icon without actually dragging it, treat it as a click.
-      if (dragState.itemType === 'icon' && !dragState.isDragging && dragState.itemId) {
-        openWindow(dragState.itemId);
-      }
-
-      setDragState({ 
-        isDragging: false,
-        isResizing: false,
-        itemId: null, 
-        itemType: null,
-        resizeDirection: null,
-        offset: { x: 0, y: 0 },
-        startPos: { x: 0, y: 0 },
-        startSize: null,
-        startWindowPos: { x: 0, y: 0 }
+        }));
       });
-    };
+    } else if (currentDragState.isDragging && currentDragState.itemType === 'icon') {
+      const newX = Math.max(0, Math.min(
+        e.clientX - desktopRect.left - currentDragState.offset.x,
+        desktopRect.width - 80
+      ));
+      const newY = Math.max(24, Math.min(
+        e.clientY - desktopRect.top - currentDragState.offset.y,
+        desktopRect.height - 100
+      ));
+      requestAnimationFrame(() => {
+        setAppState(prev => ({
+          ...prev,
+          iconPositions: {
+            ...prev.iconPositions,
+            [currentDragState.itemId!]: { x: newX, y: newY }
+          }
+        }));
+      });
+    } else if (currentDragState.isResizing && currentDragState.itemType === 'window' && currentDragState.startSize && currentDragState.startWindowPos) {
+      const originalPos = currentDragState.startWindowPos;
+      const originalSize = currentDragState.startSize;
+      let newX = originalPos.x;
+      let newY = originalPos.y;
+      let newWidth = originalSize.width;
+      let newHeight = originalSize.height;
+      const direction = currentDragState.resizeDirection;
+      const minWidth = 320;
+      const minHeight = 200;
+      const topBarHeight = 24;
+      const mouseX = Math.max(0, Math.min(e.clientX, desktopRect.width));
+      const mouseY = Math.max(topBarHeight, Math.min(e.clientY, desktopRect.height));
+      const rightEdge = originalPos.x + originalSize.width;
+      const bottomEdge = originalPos.y + originalSize.height;
 
-    if (dragState.itemId) {
+      if (direction?.includes('e')) newWidth = Math.max(minWidth, mouseX - originalPos.x);
+      if (direction?.includes('w')) {
+        newX = mouseX;
+        newWidth = rightEdge - mouseX;
+        if (newWidth < minWidth) {
+          newWidth = minWidth;
+          newX = rightEdge - minWidth;
+        }
+      }
+      if (direction?.includes('s')) newHeight = Math.max(minHeight, mouseY - originalPos.y);
+      if (direction?.includes('n')) {
+        newY = mouseY;
+        newHeight = bottomEdge - mouseY;
+        if (newHeight < minHeight) {
+          newHeight = minHeight;
+          newY = bottomEdge - minHeight;
+        }
+      }
+      requestAnimationFrame(() => {
+        setAppState(prev => ({
+          ...prev,
+          windowPositions: { ...prev.windowPositions, [currentDragState.itemId!]: { x: newX, y: newY } },
+          windowSizes: { ...prev.windowSizes, [currentDragState.itemId!]: { width: newWidth, height: newHeight } }
+        }));
+      });
+    }
+  }, [appState.windowSizes]);
+
+  const handleMouseUp = useCallback(() => {
+    const currentDragState = dragStateRef.current;
+    const distance = Math.sqrt(
+      Math.pow(mousePosRef.current.x - currentDragState.startPos.x, 2) +
+      Math.pow(mousePosRef.current.y - currentDragState.startPos.y, 2)
+    );
+
+    if (currentDragState.itemType === 'icon' && distance < 4 && currentDragState.itemId) {
+      openWindow(currentDragState.itemId);
+    }
+
+    setDragState({
+      isDragging: false,
+      isResizing: false,
+      itemId: null,
+      itemType: null,
+      resizeDirection: null,
+      offset: { x: 0, y: 0 },
+      startPos: { x: 0, y: 0 },
+      startSize: null,
+      startWindowPos: { x: 0, y: 0 }
+    });
+  }, []);
+
+  useEffect(() => {
+    if (dragState.isDragging || dragState.isResizing) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
     }
-
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [dragState]);
+  }, [dragState.isDragging, dragState.isResizing, handleMouseMove, handleMouseUp]);
 
   return (
     <div className={appState.isDarkMode ? 'dark' : ''}>
