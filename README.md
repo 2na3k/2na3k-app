@@ -1,16 +1,6 @@
-# Classic Mac OS Desktop
+# Portfolio late 2025: I vibe-coded that `TunaOS`
 
-A nostalgic recreation of the classic Mac OS desktop experience from the 1990s, built with modern web technologies while maintaining the iconic visual design and user experience of Apple's classic operating system.
-
-## Features
-
-- 🖥️ **Authentic Classic Mac OS UI**: Recreated with attention to detail
-- 🪟 **Draggable Windows**: Windows can be moved around the desktop
-- 📱 **Desktop Icons**: Clickable and draggable desktop icons
-- 🌙 **Dark/Light Mode**: Toggle between classic and modern themes
-- ⚡ **Modern Tech Stack**: Built with React, TypeScript, and Tailwind CSS
-- 🎨 **Responsive Design**: Works on different screen sizes
-- 🚀 **Fast Development**: Hot reload with Vite
+In order to just going full out for using TypeScript, I vibe-coded this.
 
 ## Getting Started
 
@@ -24,7 +14,7 @@ A nostalgic recreation of the classic Mac OS desktop experience from the 1990s, 
 1. Clone the repository:
 ```bash
 git clone <repository-url>
-cd classic-mac-desktop
+cd 2na3k-app
 ```
 
 2. Install dependencies:
@@ -72,38 +62,6 @@ src/
 - **Lucide React** - Icons
 - **ESLint** - Code linting
 
-## Features in Detail
-
-### Desktop Icons
-- Click to open windows
-- Drag to reposition
-- Hover effects with color changes
-- Authentic 90s styling
-
-### Windows
-- Draggable title bars
-- Minimize and close buttons
-- Resizable content areas
-- Classic window styling
-
-### Menu Bar
-- Apple logo and system name
-- Theme toggle (light/dark mode)
-- Classic Mac OS styling
-
-### Taskbar
-- Shows open windows
-- Click to restore minimized windows
-- Real-time clock display
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -114,10 +72,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Built with modern web technologies for the best of both worlds
 - Icons provided by [Lucide React](https://lucide.dev/)
 
-## Screenshots
-
-[Add screenshots here when available]
-
----
-
-Built with ❤️ using React & TypeScript 
+## TODOS:
+- Thinking how to mock the icon of MacOS
+- Add proper topbar, another dropdown button to navigate (search?)
+- Features: Photo Album
+- Features: Audio player
+- Features: Folder-in-folder
+- Features: CV folder
+- Features: Easter Egg
