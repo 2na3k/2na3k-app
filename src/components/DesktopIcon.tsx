@@ -25,7 +25,7 @@ const DesktopIcon: React.FC<DesktopIconProps> = ({
           <div className="w-16 h-16 mb-2 flex items-center justify-center">
             {icon}
           </div>
-          <span className="text-xs text-center text-black max-w-20 truncate">
+          <span className="text-xs text-center font-bold text-black max-w-20 truncate">
             {title}
           </span>
         </div>
