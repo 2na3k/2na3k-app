@@ -1,5 +1,5 @@
 {
-  "name": "classic-mac-desktop",
+  "name": "2na3k-app",
   "version": "1.0.0",
   "type": "module",
   "description": "A nostalgic recreation of the classic Mac OS desktop experience from the 1990s",
@@ -20,7 +20,7 @@
     "classic",
     "ui"
   ],
-  "author": "Your Name",
+  "author": "2na3k",
   "license": "MIT",
   "dependencies": {
     "react": "^18.2.0",
