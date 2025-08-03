@@ -15,8 +15,8 @@ const ClassicMacDesktop: React.FC = () => {
       projects: { x: 150, y: 150 }
     },
     windowSizes: {
-      about: { width: 500, height: 400 },
-      projects: { width: 550, height: 450 }
+      about: { width: 400, height: 300 },
+      projects: { width: 450, height: 350 }
     },
     iconPositions: {
       about: { x: 50, y: 50 },
@@ -223,10 +223,31 @@ const ClassicMacDesktop: React.FC = () => {
       const width = Math.abs(startPos.x - currentX);
       const height = Math.abs(startPos.y - currentY);
       
+      const selected = new Set<string>();
+      const iconRects = Object.entries(appState.iconPositions).map(([id, pos]) => ({
+        id,
+        x: pos.x,
+        y: pos.y,
+        width: 80,  // Approximate width
+        height: 100 // Approximate height
+      }));
+
+      iconRects.forEach(icon => {
+        if (
+          icon.x < x + width &&
+          icon.x + icon.width > x &&
+          icon.y < y + height &&
+          icon.y + icon.height > y
+        ) {
+          selected.add(icon.id);
+        }
+      });
+
       requestAnimationFrame(() => {
         setAppState(prev => ({
           ...prev,
-          selectionBox: { x, y, width, height }
+          selectionBox: { x, y, width, height },
+          selectedIcons: selected
         }));
       });
     } else if (currentDragState.isDragging && currentDragState.itemId && currentDragState.itemType === 'window') {
@@ -332,35 +353,7 @@ const ClassicMacDesktop: React.FC = () => {
 
   const handleMouseUp = useCallback(() => {
     const currentDragState = dragStateRef.current;
-    if (currentDragState.isSelecting && appState.selectionBox) {
-      const selection = appState.selectionBox;
-      const selected = new Set<string>();
-      
-      const iconRects = Object.entries(appState.iconPositions).map(([id, pos]) => ({
-        id,
-        x: pos.x,
-        y: pos.y,
-        width: 80,  // Approximate width
-        height: 100 // Approximate height
-      }));
-
-      iconRects.forEach(icon => {
-        if (
-          icon.x < selection.x + selection.width &&
-          icon.x + icon.width > selection.x &&
-          icon.y < selection.y + selection.height &&
-          icon.y + icon.height > selection.y
-        ) {
-          selected.add(icon.id);
-        }
-      });
-
-      setAppState(prev => ({
-        ...prev,
-        selectionBox: null,
-        selectedIcons: selected
-      }));
-    } else if (currentDragState.isDragging) {
+    if (currentDragState.isDragging) {
         const distance = Math.sqrt(
             Math.pow(mousePosRef.current.x - currentDragState.startPos.x, 2) +
             Math.pow(mousePosRef.current.y - currentDragState.startPos.y, 2)
