@@ -18,7 +18,7 @@ const DesktopIcon: React.FC<DesktopIconProps> = ({
       onMouseDown={onDragStart}
       onClick={onClick}
     >
-          {icon}
+          <img src={icon} alt="About" className="w-12 h-12 justify-center pointer-events-none object-contain" />
           <span className="text-xs text-center font-bold text-black max-w-20 truncate pointer-events-none">
             {title}
           </span>

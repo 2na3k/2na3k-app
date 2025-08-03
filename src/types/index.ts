@@ -19,7 +19,7 @@ export interface WindowProps {
 export interface DesktopIconProps {
   id: string;
   title: string;
-  icon: React.ReactNode;
+  icon: string;
   onClick?: () => void;
   position: { x: number; y: number };
   onDragStart: (_e: React.MouseEvent) => void;
@@ -49,5 +49,5 @@ export interface DragState {
 export interface DesktopIcon {
   id: string;
   title: string;
-  icon: React.ReactNode;
+  icon: string;
 }
