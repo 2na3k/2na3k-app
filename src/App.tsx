@@ -350,7 +350,7 @@ const ClassicMacDesktop: React.FC = () => {
         }));
       });
     }
-  }, [appState.windowSizes]);
+  }, [appState.windowSizes, appState.iconPositions]);
 
   const handleMouseUp = useCallback(() => {
     const currentDragState = dragStateRef.current;
@@ -383,7 +383,7 @@ const ClassicMacDesktop: React.FC = () => {
 
     // Always clear selection box on mouse up
     setAppState(prev => ({ ...prev, selectionBox: null }));
-  }, [appState.selectedIcons, appState.iconPositions]);
+  }, [appState.selectedIcons, appState.iconPositions, openWindow]);
 
   const handleDesktopMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     // Prevent starting selection when clicking on other elements like icons or windows
