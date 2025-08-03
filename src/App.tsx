@@ -313,7 +313,7 @@ const ClassicMacDesktop: React.FC = () => {
         {/* Menu Bar */}
         <div className="absolute top-0 left-0 right-0 h-6 bg-gray-200 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 flex items-center px-4 text-xs z-50">
           <div className="flex items-center space-x-4">
-            <span className="font-bold">🐠</span>
+            <span className="font-bold">🐟</span>
             <span className="text-gray-700 dark:text-gray-300 font-bold">TunaOS</span>
           </div>
           <div className="ml-auto text-gray-600 dark:text-gray-400">
