@@ -140,6 +140,7 @@ const ClassicMacDesktop: React.FC = () => {
 
   // Drag handling for icons
   const handleIconDragStart = (iconId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     const isSelected = appState.selectedIcons.has(iconId);
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     
