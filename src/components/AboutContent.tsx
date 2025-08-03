@@ -15,7 +15,7 @@ const AboutContent: React.FC = () => (
     
     <div className="border-t border-gray-300 dark:border-gray-600 pt-4">
       <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
-        A nostalgic recreation of 2 persons when they was too young and broke, now their son has to deal with it.
+        An OS built by thanhlc6 (aka @2na3k) as an engineer, AI advocator and one-liner developer.
       </p>
       <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
         Built with modern web technologies while maintaining the iconic visual design and user experience of Apple's classic operating system.

@@ -38,7 +38,7 @@ const DesktopWindow: React.FC<WindowProps> = ({
     >
       {/* Title Bar */}
       <div
-        className={`px-4 py-2 rounded-t-md cursor-move flex justify-between items-center transition-colors duration-200 ${
+        className={`px-4 py-2 rounded-t-md cursor-move flex items-center transition-colors duration-200 ${
           isFocused
             ? 'bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white'
             : 'bg-gradient-to-r from-gray-400 to-gray-500 dark:from-gray-500 dark:to-gray-600 text-gray-800 dark:text-gray-300'
@@ -48,7 +48,6 @@ const DesktopWindow: React.FC<WindowProps> = ({
           onDragStart(e);
         }}
       >
-        <h3 className="text-sm font-medium">{title}</h3>
         <div className="flex space-x-2">
           <button
             onClick={onClose}
@@ -57,6 +56,8 @@ const DesktopWindow: React.FC<WindowProps> = ({
             <X size={8} className="text-white" />
           </button>
         </div>
+        <h3 className="flex-grow text-center text-sm font-medium">{title}</h3>
+        <div className="w-4" /> {/* Spacer to balance the close button */}
       </div>
       
       {/* Window Content */}
