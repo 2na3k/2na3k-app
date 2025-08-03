@@ -23,6 +23,7 @@ export interface DesktopIconProps {
   onClick?: () => void;
   position: { x: number; y: number };
   onDragStart: (_e: React.MouseEvent) => void;
+  isSelected: boolean;
 }
 
 export interface AppState {
@@ -38,6 +39,7 @@ export interface AppState {
     width: number;
     height: number;
   } | null;
+  selectedIcons: Set<string>;
 }
 
 export interface DragState {

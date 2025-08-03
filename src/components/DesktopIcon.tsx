@@ -6,11 +6,13 @@ const DesktopIcon: React.FC<DesktopIconProps> = ({
   icon, 
   onClick, 
   position, 
-  onDragStart 
+  onDragStart,
+  isSelected
 }) => {
+  const containerClasses = `absolute cursor-pointer flex flex-col items-center p-2 rounded-md ${isSelected ? 'bg-gray-300 bg-opacity-50' : ''}`;
   return (
     <div
-      className="absolute cursor-pointer flex flex-col items-center"
+      className={containerClasses}
       style={{ 
         willChange: 'transform',
         transform: `translate(${position.x}px, ${position.y}px)`,

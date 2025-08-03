@@ -23,7 +23,8 @@ const ClassicMacDesktop: React.FC = () => {
       projects: { x: 50, y: 150 }
     },
     focusedWindow: null,
-    selectionBox: null
+    selectionBox: null,
+    selectedIcons: new Set()
   });
 
   const [dragState, setDragState] = useState<DragState>({
@@ -286,18 +287,43 @@ const ClassicMacDesktop: React.FC = () => {
 
   const handleMouseUp = useCallback(() => {
     const currentDragState = dragStateRef.current;
-    if (currentDragState.isSelecting) {
-      // Logic to select icons within the selection box can be added here
-      setAppState(prev => ({ ...prev, selectionBox: null }));
-    } else {
-      const distance = Math.sqrt(
-        Math.pow(mousePosRef.current.x - currentDragState.startPos.x, 2) +
-        Math.pow(mousePosRef.current.y - currentDragState.startPos.y, 2)
-      );
+    if (currentDragState.isSelecting && appState.selectionBox) {
+      const selection = appState.selectionBox;
+      const selected = new Set<string>();
+      
+      const iconRects = Object.entries(appState.iconPositions).map(([id, pos]) => ({
+        id,
+        x: pos.x,
+        y: pos.y,
+        width: 80,  // Approximate width
+        height: 100 // Approximate height
+      }));
 
-      if (currentDragState.itemType === 'icon' && distance < 4 && currentDragState.itemId) {
-        openWindow(currentDragState.itemId);
-      }
+      iconRects.forEach(icon => {
+        if (
+          icon.x < selection.x + selection.width &&
+          icon.x + icon.width > selection.x &&
+          icon.y < selection.y + selection.height &&
+          icon.y + icon.height > selection.y
+        ) {
+          selected.add(icon.id);
+        }
+      });
+
+      setAppState(prev => ({
+        ...prev,
+        selectionBox: null,
+        selectedIcons: selected
+      }));
+    } else if (currentDragState.isDragging) {
+        const distance = Math.sqrt(
+            Math.pow(mousePosRef.current.x - currentDragState.startPos.x, 2) +
+            Math.pow(mousePosRef.current.y - currentDragState.startPos.y, 2)
+        );
+
+        if (currentDragState.itemType === 'icon' && distance < 4 && currentDragState.itemId) {
+            openWindow(currentDragState.itemId);
+        }
     }
 
     setDragState({
@@ -312,11 +338,17 @@ const ClassicMacDesktop: React.FC = () => {
       startSize: null,
       startWindowPos: { x: 0, y: 0 }
     });
-  }, []);
+
+    // Always clear selection box on mouse up
+    setAppState(prev => ({ ...prev, selectionBox: null }));
+  }, [appState.selectionBox, appState.iconPositions]);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     // Prevent starting selection when clicking on other elements
     if (e.target !== desktopRef.current) return;
+
+    // Clear selected icons when clicking on the desktop
+    setAppState(prev => ({ ...prev, selectedIcons: new Set() }));
 
     const desktopRect = desktopRef.current.getBoundingClientRect();
     setDragState({
@@ -394,6 +426,7 @@ const ClassicMacDesktop: React.FC = () => {
               icon={icon.icon}
               position={appState.iconPositions[icon.id]}
               onDragStart={(e) => handleIconDragStart(icon.id, e)}
+              isSelected={appState.selectedIcons.has(icon.id)}
             />
           ))}
         </div>
