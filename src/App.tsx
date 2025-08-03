@@ -140,24 +140,48 @@ const ClassicMacDesktop: React.FC = () => {
 
   // Drag handling for icons
   const handleIconDragStart = (iconId: string, e: React.MouseEvent) => {
+    const isSelected = appState.selectedIcons.has(iconId);
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    setDragState({
-      isDragging: true, // Set to true immediately
-      isResizing: false,
-      isSelecting: false,
-      itemId: iconId,
-      itemType: 'icon',
-      resizeDirection: null,
-      offset: {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top
-      },
-      startPos: {
-        x: e.clientX,
-        y: e.clientY
-      },
-      startSize: null
-    });
+    
+    if (isSelected && appState.selectedIcons.size > 1) {
+      // Multi-drag
+      const multiDragStartPositions = Array.from(appState.selectedIcons).reduce((acc, id) => {
+        acc[id] = appState.iconPositions[id];
+        return acc;
+      }, {} as Record<string, { x: number; y: number }>);
+
+      setDragState({
+        isDragging: true,
+        isResizing: false,
+        isSelecting: false,
+        itemId: iconId,
+        itemType: 'icon',
+        resizeDirection: null,
+        offset: { x: e.clientX, y: e.clientY },
+        startPos: { x: e.clientX, y: e.clientY },
+        startSize: null,
+        multiDragStartPositions
+      });
+    } else {
+      // Single-drag
+      if (!isSelected) {
+        setAppState(prev => ({ ...prev, selectedIcons: new Set([iconId]) }));
+      }
+      setDragState({
+        isDragging: true,
+        isResizing: false,
+        isSelecting: false,
+        itemId: iconId,
+        itemType: 'icon',
+        resizeDirection: null,
+        offset: {
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top
+        },
+        startPos: { x: e.clientX, y: e.clientY },
+        startSize: null
+      });
+    }
   };
 
   // Resize handling for windows
@@ -224,23 +248,44 @@ const ClassicMacDesktop: React.FC = () => {
         }));
       });
     } else if (currentDragState.isDragging && currentDragState.itemType === 'icon') {
-      const newX = Math.max(0, Math.min(
-        e.clientX - desktopRect.left - currentDragState.offset.x,
-        desktopRect.width - 80
-      ));
-      const newY = Math.max(24, Math.min(
-        e.clientY - desktopRect.top - currentDragState.offset.y,
-        desktopRect.height - 100
-      ));
-      requestAnimationFrame(() => {
-        setAppState(prev => ({
-          ...prev,
-          iconPositions: {
-            ...prev.iconPositions,
-            [currentDragState.itemId!]: { x: newX, y: newY }
-          }
-        }));
-      });
+      if (currentDragState.multiDragStartPositions) {
+        // Multi-drag update
+        const dx = e.clientX - currentDragState.startPos.x;
+        const dy = e.clientY - currentDragState.startPos.y;
+        const newIconPositions = { ...appState.iconPositions };
+
+        Object.keys(currentDragState.multiDragStartPositions).forEach(id => {
+          const startPos = currentDragState.multiDragStartPositions![id];
+          newIconPositions[id] = {
+            x: Math.max(0, Math.min(startPos.x + dx, desktopRect.width - 80)),
+            y: Math.max(24, Math.min(startPos.y + dy, desktopRect.height - 100))
+          };
+        });
+        
+        requestAnimationFrame(() => {
+          setAppState(prev => ({ ...prev, iconPositions: newIconPositions }));
+        });
+
+      } else {
+        // Single-drag update
+        const newX = Math.max(0, Math.min(
+          e.clientX - desktopRect.left - currentDragState.offset.x,
+          desktopRect.width - 80
+        ));
+        const newY = Math.max(24, Math.min(
+          e.clientY - desktopRect.top - currentDragState.offset.y,
+          desktopRect.height - 100
+        ));
+        requestAnimationFrame(() => {
+          setAppState(prev => ({
+            ...prev,
+            iconPositions: {
+              ...prev.iconPositions,
+              [currentDragState.itemId!]: { x: newX, y: newY }
+            }
+          }));
+        });
+      }
     } else if (currentDragState.isResizing && currentDragState.itemType === 'window' && currentDragState.startSize && currentDragState.startWindowPos) {
       const originalPos = currentDragState.startWindowPos;
       const originalSize = currentDragState.startSize;

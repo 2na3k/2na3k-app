@@ -53,6 +53,7 @@ export interface DragState {
   startPos: { x: number; y: number };
   startSize: { width: number; height: number } | null;
   startWindowPos?: { x: number; y: number };
+  multiDragStartPositions?: Record<string, { x: number; y: number }>;
 }
 
 export interface DesktopIcon {
