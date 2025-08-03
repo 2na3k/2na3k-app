@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import folderIcon from './static/icons/folder.png';
+// import contactIcon from './static/icons/contact.png';
 import DesktopIcon from './components/DesktopIcon';
 import DesktopWindow from './components/Window';
 import AboutContent from './components/AboutContent';
 import ProjectsContent from './components/ProjectsContent';
+import ContactContent from './components/ContactContent';
 import { AppState, DragState, DesktopIcon as DesktopIconType } from './types';
 
 const ClassicMacDesktop: React.FC = () => {
@@ -12,15 +14,18 @@ const ClassicMacDesktop: React.FC = () => {
     openWindows: new Set(),
     windowPositions: {
       about: { x: 100, y: 100 },
-      projects: { x: 150, y: 150 }
+      projects: { x: 150, y: 150 },
+      contacts: { x: 200, y: 200 }
     },
     windowSizes: {
       about: { width: 400, height: 300 },
-      projects: { width: 450, height: 350 }
+      projects: { width: 450, height: 350 },
+      contacts: { width: 400, height: 250 }
     },
     iconPositions: {
       about: { x: 50, y: 50 },
-      projects: { x: 50, y: 150 }
+      projects: { x: 50, y: 150 },
+      contacts: { x: 50, y: 250 }
     },
     focusedWindow: null,
     selectionBox: null,
@@ -58,7 +63,8 @@ const ClassicMacDesktop: React.FC = () => {
         ...prev,
         iconPositions: {
           about: { x: newX, y: 50 },
-          projects: { x: newX, y: 150 }
+          projects: { x: newX, y: 150 },
+          contacts: { x: newX, y: 250 }
         }
       }));
     }
@@ -86,6 +92,11 @@ const ClassicMacDesktop: React.FC = () => {
     {
       id: 'projects',
       title: 'Projects',
+      icon: folderIcon
+    },
+    {
+      id: 'contacts',
+      title: 'Contacts',
       icon: folderIcon
     }
   ];
@@ -506,6 +517,23 @@ const ClassicMacDesktop: React.FC = () => {
           onResizeStart={(e, direction) => handleWindowResizeStart('projects', direction, e)}
         >
           <ProjectsContent />
+        </DesktopWindow>
+
+        <DesktopWindow
+          id="contacts"
+          title="Contacts"
+          isOpen={appState.openWindows.has('contacts')}
+          isFocused={appState.focusedWindow === 'contacts'}
+          isDragging={dragState.isDragging && dragState.itemId === 'contacts'}
+          isResizing={dragState.isResizing && dragState.itemId === 'contacts'}
+          onClose={() => closeWindow('contacts')}
+          onFocus={() => focusWindow('contacts')}
+          position={appState.windowPositions.contacts}
+          size={appState.windowSizes.contacts}
+          onDragStart={(e) => handleWindowDragStart('contacts', e)}
+          onResizeStart={(e, direction) => handleWindowResizeStart('contacts', direction, e)}
+        >
+          <ContactContent />
         </DesktopWindow>
 
 
