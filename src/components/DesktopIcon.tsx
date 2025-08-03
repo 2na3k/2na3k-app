@@ -10,7 +10,7 @@ const DesktopIcon: React.FC<DesktopIconProps> = ({
 }) => {
   return (
     <div
-      className="absolute cursor-pointer"
+      className="absolute cursor-pointer flex flex-col items-center"
       style={{ 
         willChange: 'transform',
         transform: `translate(${position.x}px, ${position.y}px)`
@@ -18,16 +18,10 @@ const DesktopIcon: React.FC<DesktopIconProps> = ({
       onMouseDown={onDragStart}
       onClick={onClick}
     >
-        <div 
-          className="flex flex-col items-center group"
-        >
-          <div className="w-16 h-16 mb-2 flex items-center justify-center pointer-events-auto">
-            {icon}
-          </div>
-          <span className="text-xs text-center font-bold text-black max-w-20 truncate pointer-events-auto">
+          {icon}
+          <span className="text-xs text-center font-bold text-black max-w-20 truncate pointer-events-none">
             {title}
           </span>
-        </div>
     </div>
   );
 };
