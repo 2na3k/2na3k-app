@@ -66,7 +66,7 @@ const ClassicMacDesktop: React.FC = () => {
     {
       id: 'about',
       title: 'About',
-      icon: <img src={folderIcon} alt="About" className="w-12 h-12 justify-center pointer-events-auto object-contain" />
+      icon: <img src={folderIcon} alt="About" className="w-12 h-12 justify-center pointer-events-none object-contain" />
     },
     {
       id: 'projects',
