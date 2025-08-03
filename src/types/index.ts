@@ -32,11 +32,18 @@ export interface AppState {
   windowSizes: Record<string, { width: number; height: number }>;
   iconPositions: Record<string, { x: number; y: number }>;
   focusedWindow: string | null;
+  selectionBox: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null;
 }
 
 export interface DragState {
   isDragging: boolean;
   isResizing: boolean;
+  isSelecting: boolean;
   itemId: string | null;
   itemType: 'window' | 'icon' | null;
   resizeDirection: string | null;

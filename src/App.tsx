@@ -22,12 +22,14 @@ const ClassicMacDesktop: React.FC = () => {
       about: { x: 50, y: 50 },
       projects: { x: 50, y: 150 }
     },
-    focusedWindow: null
+    focusedWindow: null,
+    selectionBox: null
   });
 
   const [dragState, setDragState] = useState<DragState>({
     isDragging: false,
     isResizing: false,
+    isSelecting: false,
     itemId: null,
     itemType: null,
     resizeDirection: null,
@@ -119,6 +121,7 @@ const ClassicMacDesktop: React.FC = () => {
     setDragState({
       isDragging: true,
       isResizing: false,
+      isSelecting: false,
       itemId: windowId,
       itemType: 'window',
       resizeDirection: null,
@@ -140,6 +143,7 @@ const ClassicMacDesktop: React.FC = () => {
     setDragState({
       isDragging: true, // Set to true immediately
       isResizing: false,
+      isSelecting: false,
       itemId: iconId,
       itemType: 'icon',
       resizeDirection: null,
@@ -164,6 +168,7 @@ const ClassicMacDesktop: React.FC = () => {
     setDragState({
       isDragging: false,
       isResizing: true,
+      isSelecting: false,
       itemId: windowId,
       itemType: 'window',
       resizeDirection: direction,
@@ -180,11 +185,26 @@ const ClassicMacDesktop: React.FC = () => {
   const handleMouseMove = useCallback((e: MouseEvent) => {
     mousePosRef.current = { x: e.clientX, y: e.clientY };
     const currentDragState = dragStateRef.current;
-    if (!currentDragState.itemId || !desktopRef.current) return;
+    if (!desktopRef.current) return;
 
     const desktopRect = desktopRef.current.getBoundingClientRect();
-    
-    if (currentDragState.isDragging && currentDragState.itemType === 'window') {
+
+    if (currentDragState.isSelecting) {
+      const { startPos } = currentDragState;
+      const currentX = e.clientX - desktopRect.left;
+      const currentY = e.clientY - desktopRect.top;
+      const x = Math.min(startPos.x, currentX);
+      const y = Math.min(startPos.y, currentY);
+      const width = Math.abs(startPos.x - currentX);
+      const height = Math.abs(startPos.y - currentY);
+      
+      requestAnimationFrame(() => {
+        setAppState(prev => ({
+          ...prev,
+          selectionBox: { x, y, width, height }
+        }));
+      });
+    } else if (currentDragState.isDragging && currentDragState.itemId && currentDragState.itemType === 'window') {
       const newX = Math.max(0, Math.min(
         e.clientX - currentDragState.offset.x,
         desktopRect.width - appState.windowSizes[currentDragState.itemId!].width
@@ -266,18 +286,24 @@ const ClassicMacDesktop: React.FC = () => {
 
   const handleMouseUp = useCallback(() => {
     const currentDragState = dragStateRef.current;
-    const distance = Math.sqrt(
-      Math.pow(mousePosRef.current.x - currentDragState.startPos.x, 2) +
-      Math.pow(mousePosRef.current.y - currentDragState.startPos.y, 2)
-    );
+    if (currentDragState.isSelecting) {
+      // Logic to select icons within the selection box can be added here
+      setAppState(prev => ({ ...prev, selectionBox: null }));
+    } else {
+      const distance = Math.sqrt(
+        Math.pow(mousePosRef.current.x - currentDragState.startPos.x, 2) +
+        Math.pow(mousePosRef.current.y - currentDragState.startPos.y, 2)
+      );
 
-    if (currentDragState.itemType === 'icon' && distance < 4 && currentDragState.itemId) {
-      openWindow(currentDragState.itemId);
+      if (currentDragState.itemType === 'icon' && distance < 4 && currentDragState.itemId) {
+        openWindow(currentDragState.itemId);
+      }
     }
 
     setDragState({
       isDragging: false,
       isResizing: false,
+      isSelecting: false,
       itemId: null,
       itemType: null,
       resizeDirection: null,
@@ -288,8 +314,30 @@ const ClassicMacDesktop: React.FC = () => {
     });
   }, []);
 
+  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Prevent starting selection when clicking on other elements
+    if (e.target !== desktopRef.current) return;
+
+    const desktopRect = desktopRef.current.getBoundingClientRect();
+    setDragState({
+      isDragging: false,
+      isResizing: false,
+      isSelecting: true,
+      itemId: null,
+      itemType: null,
+      resizeDirection: null,
+      offset: { x: 0, y: 0 },
+      startPos: { 
+        x: e.clientX - desktopRect.left,
+        y: e.clientY - desktopRect.top
+      },
+      startSize: null,
+      startWindowPos: { x: 0, y: 0 }
+    });
+  };
+
   useEffect(() => {
-    if (dragState.isDragging || dragState.isResizing) {
+    if (dragState.isDragging || dragState.isResizing || dragState.isSelecting) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
     }
@@ -297,12 +345,13 @@ const ClassicMacDesktop: React.FC = () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [dragState.isDragging, dragState.isResizing, handleMouseMove, handleMouseUp]);
+  }, [dragState.isDragging, dragState.isResizing, dragState.isSelecting, handleMouseMove, handleMouseUp]);
 
   return (
     <div className={appState.isDarkMode ? 'dark' : ''}>
       <div
         ref={desktopRef}
+        onMouseDown={handleMouseDown}
         className="w-full h-screen bg-gradient-to-br from-teal-400 via-blue-500 to-purple-600 dark:from-gray-800 dark:via-gray-900 dark:to-black relative overflow-hidden select-none"
         style={{
           backgroundImage: appState.isDarkMode 
@@ -310,6 +359,20 @@ const ClassicMacDesktop: React.FC = () => {
             : 'radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.2) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)'
         }}
       >
+        {/* Selection Box */}
+        {appState.selectionBox && (
+          <div
+            className="absolute border-2 border-blue-500 bg-blue-500 bg-opacity-20"
+            style={{
+              left: appState.selectionBox.x,
+              top: appState.selectionBox.y,
+              width: appState.selectionBox.width,
+              height: appState.selectionBox.height,
+              zIndex: 5
+            }}
+          />
+        )}
+
         {/* Menu Bar */}
         <div className="absolute top-0 left-0 right-0 h-6 bg-gray-200 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-700 flex items-center px-4 text-xs z-50">
           <div className="flex items-center space-x-4">
