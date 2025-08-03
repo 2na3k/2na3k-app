@@ -73,10 +73,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Icons provided by [Lucide React](https://lucide.dev/)
 
 ## TODOS:
-- Hovering to drag and drop by group
+- 
 - Thinking how to mock the icon of MacOS
 - Add proper topbar, another dropdown button to navigate (search?)
-- Features: Photo Album
+- Features: Photo
 - Features: Audio player
 - Features: Folder-in-folder
 - Features: CV folder

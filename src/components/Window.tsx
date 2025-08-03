@@ -55,9 +55,15 @@ const DesktopWindow: React.FC<WindowProps> = ({
           >
             <X size={8} className="text-white" />
           </button>
+          <button
+            className="w-4 h-4 bg-yellow-500 hover:bg-yellow-600 rounded-full flex items-center justify-center transition-colors"
+          />
+          <button
+            className="w-4 h-4 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center transition-colors"
+          />
         </div>
         <h3 className="flex-grow text-center text-sm font-medium">{title}</h3>
-        <div className="w-4" /> {/* Spacer to balance the close button */}
+        <div className="w-20" /> {/* Spacer to balance the close button */}
       </div>
       
       {/* Window Content */}
