@@ -14,7 +14,7 @@ const DesktopIcon: React.FC<DesktopIconProps> = ({
       style={{ 
         willChange: 'transform',
         transform: `translate(${position.x}px, ${position.y}px)`,
-        zIndex: 10
+        zIndex: 5
       }}
       onMouseDown={onDragStart}
       onClick={onClick}

@@ -368,7 +368,7 @@ const ClassicMacDesktop: React.FC = () => {
               top: appState.selectionBox.y,
               width: appState.selectionBox.width,
               height: appState.selectionBox.height,
-              zIndex: 5
+              zIndex: 10
             }}
           />
         )}

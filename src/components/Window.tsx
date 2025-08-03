@@ -30,7 +30,7 @@ const DesktopWindow: React.FC<WindowProps> = ({
         height: size.height,
         minWidth: 320,
         minHeight: 200,
-        zIndex: isFocused ? 100 : 10,
+        zIndex: isFocused ? 100 : 15,
         willChange: 'transform',
         transform: `translate(${position.x}px, ${position.y}px)`
       }}
