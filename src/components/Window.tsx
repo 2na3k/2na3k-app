@@ -72,42 +72,42 @@ const DesktopWindow: React.FC<WindowProps> = ({
 
       {/* Resize Handles */}
       <div
-        className="absolute -top-1 -left-1 w-8 h-8 cursor-nw-resize z-10"
+        className="absolute -top-1 -left-1 w-4 h-4 cursor-nw-resize z-10"
         onMouseDown={(e) => {
           e.stopPropagation();
           onResizeStart(e, 'nw');
         }}
       />
       <div
-        className="absolute -top-1 -right-1 w-8 h-8 cursor-ne-resize z-10"
+        className="absolute -top-1 -right-1 w-4 h-4 cursor-ne-resize z-10"
         onMouseDown={(e) => {
           e.stopPropagation();
           onResizeStart(e, 'ne');
         }}
       />
       <div
-        className="absolute -bottom-1 -left-1 w-8 h-8 cursor-sw-resize z-10"
+        className="absolute -bottom-1 -left-1 w-4 h-4 cursor-sw-resize z-10"
         onMouseDown={(e) => {
           e.stopPropagation();
           onResizeStart(e, 'sw');
         }}
       />
       <div
-        className="absolute -bottom-1 -right-1 w-8 h-8 cursor-se-resize z-10"
+        className="absolute -bottom-1 -right-1 w-4 h-4 cursor-se-resize z-10"
         onMouseDown={(e) => {
           e.stopPropagation();
           onResizeStart(e, 'se');
         }}
       />
       <div
-        className="absolute top-1/2 -translate-y-1/2 -left-1 w-8 h-full cursor-w-resize z-20"
+        className="absolute top-1/2 -translate-y-1/2 -left-1 w-4 h-full cursor-w-resize z-20"
         onMouseDown={(e) => {
           e.stopPropagation();
           onResizeStart(e, 'w');
         }}
       />
       <div
-        className="absolute top-1/2 -translate-y-1/2 -right-1 w-8 h-full cursor-e-resize z-20"
+        className="absolute top-1/2 -translate-y-1/2 -right-1 w-4 h-full cursor-e-resize z-20"
         onMouseDown={(e) => {
           e.stopPropagation();
           onResizeStart(e, 'e');
@@ -121,7 +121,7 @@ const DesktopWindow: React.FC<WindowProps> = ({
         }}
       />
       <div
-        className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-full h-8 cursor-s-resize z-20"
+        className="absolute left-1/2 -translate-x-1/2 -bottom-1 w-full h-4 cursor-s-resize z-20"
         onMouseDown={(e) => {
           e.stopPropagation();
           onResizeStart(e, 's');
