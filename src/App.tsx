@@ -102,27 +102,27 @@ const ClassicMacDesktop: React.FC = () => {
   ];
 
   // Window management functions
-  const openWindow = (windowId: string) => {
+  const openWindow = useCallback((windowId: string) => {
     setAppState(prev => ({
       ...prev,
       openWindows: new Set([...prev.openWindows, windowId]),
       focusedWindow: windowId
     }));
-  };
+  }, []);
 
-  const closeWindow = (windowId: string) => {
+  const closeWindow = useCallback((windowId: string) => {
     setAppState(prev => ({
       ...prev,
       openWindows: new Set([...prev.openWindows].filter(id => id !== windowId))
     }));
-  };
+  }, []);
 
-  const focusWindow = (windowId: string) => {
+  const focusWindow = useCallback((windowId: string) => {
     setAppState(prev => ({
       ...prev,
       focusedWindow: windowId
     }));
-  };
+  }, []);
 
   // Drag handling for windows
   const handleWindowDragStart = (windowId: string, e: React.MouseEvent) => {
@@ -374,7 +374,11 @@ const ClassicMacDesktop: React.FC = () => {
         if (currentDragState.itemType === 'icon' && distance < 4 && currentDragState.itemId) {
             // If not part of a multi-selection, open the window
             if (appState.selectedIcons.size <= 1) {
-              openWindow(currentDragState.itemId);
+              if (appState.openWindows.has(currentDragState.itemId)) {
+                focusWindow(currentDragState.itemId);
+              } else {
+                openWindow(currentDragState.itemId);
+              }
             }
         }
     }
@@ -394,7 +398,7 @@ const ClassicMacDesktop: React.FC = () => {
 
     // Always clear selection box on mouse up
     setAppState(prev => ({ ...prev, selectionBox: null }));
-  }, [appState.selectedIcons, appState.iconPositions, openWindow]);
+  }, [appState.selectedIcons, appState.openWindows, openWindow, focusWindow]);
 
   const handleDesktopMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     // Prevent starting selection when clicking on other elements like icons or windows
@@ -464,7 +468,7 @@ const ClassicMacDesktop: React.FC = () => {
             <span className="font-bold">🐟</span>
             <span className="text-gray-700 dark:text-gray-300 font-bold">TunaOS</span>
           </div>
-          <div className="ml-auto text-gray-600 dark:text-gray-400">
+          <div className="ml-auto font-bold text-gray-600 dark:text-gray-400">
             {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </div>
         </div>
