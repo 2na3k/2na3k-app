@@ -9,7 +9,7 @@ const DesktopIcon: React.FC<DesktopIconProps> = ({
   onDragStart 
 }) => {
   return (
-    <div
+    <span
       className="absolute cursor-pointer"
       style={{ 
         willChange: 'transform',
@@ -20,7 +20,7 @@ const DesktopIcon: React.FC<DesktopIconProps> = ({
     >
       <div className="p-2">
         <div 
-          className="flex flex-col items-center group select-none"
+          className="flex flex-col items-center group"
         >
           <div className="w-16 h-16 mb-2 flex items-center justify-center">
             {icon}
@@ -30,7 +30,7 @@ const DesktopIcon: React.FC<DesktopIconProps> = ({
           </span>
         </div>
       </div>
-    </div>
+    </span>
   );
 };
 
