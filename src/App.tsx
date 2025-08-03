@@ -360,7 +360,10 @@ const ClassicMacDesktop: React.FC = () => {
         );
 
         if (currentDragState.itemType === 'icon' && distance < 4 && currentDragState.itemId) {
-            openWindow(currentDragState.itemId);
+            // If not part of a multi-selection, open the window
+            if (appState.selectedIcons.size <= 1) {
+              openWindow(currentDragState.itemId);
+            }
         }
     }
 
@@ -379,16 +382,16 @@ const ClassicMacDesktop: React.FC = () => {
 
     // Always clear selection box on mouse up
     setAppState(prev => ({ ...prev, selectionBox: null }));
-  }, [appState.selectionBox, appState.iconPositions]);
+  }, [appState.selectedIcons, appState.iconPositions]);
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Prevent starting selection when clicking on other elements
+  const handleDesktopMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Prevent starting selection when clicking on other elements like icons or windows
     if (e.target !== desktopRef.current) return;
 
     // Clear selected icons when clicking on the desktop
     setAppState(prev => ({ ...prev, selectedIcons: new Set() }));
 
-    const desktopRect = desktopRef.current.getBoundingClientRect();
+    const desktopRect = desktopRef.current!.getBoundingClientRect();
     setDragState({
       isDragging: false,
       isResizing: false,
@@ -421,7 +424,7 @@ const ClassicMacDesktop: React.FC = () => {
     <div className={appState.isDarkMode ? 'dark' : ''}>
       <div
         ref={desktopRef}
-        onMouseDown={handleMouseDown}
+        onMouseDown={handleDesktopMouseDown}
         className="w-full h-screen bg-gradient-to-br from-teal-400 via-blue-500 to-purple-600 dark:from-gray-800 dark:via-gray-900 dark:to-black relative overflow-hidden select-none"
         style={{
           backgroundImage: appState.isDarkMode 
