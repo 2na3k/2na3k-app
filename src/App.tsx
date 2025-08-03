@@ -364,25 +364,6 @@ const ClassicMacDesktop: React.FC = () => {
   }, [appState.windowSizes, appState.iconPositions]);
 
   const handleMouseUp = useCallback(() => {
-    const currentDragState = dragStateRef.current;
-    if (currentDragState.isDragging) {
-        const distance = Math.sqrt(
-            Math.pow(mousePosRef.current.x - currentDragState.startPos.x, 2) +
-            Math.pow(mousePosRef.current.y - currentDragState.startPos.y, 2)
-        );
-
-        if (currentDragState.itemType === 'icon' && distance < 4 && currentDragState.itemId) {
-            // If not part of a multi-selection, open the window
-            if (appState.selectedIcons.size <= 1) {
-              if (appState.openWindows.has(currentDragState.itemId)) {
-                focusWindow(currentDragState.itemId);
-              } else {
-                openWindow(currentDragState.itemId);
-              }
-            }
-        }
-    }
-
     setDragState({
       isDragging: false,
       isResizing: false,
@@ -398,7 +379,15 @@ const ClassicMacDesktop: React.FC = () => {
 
     // Always clear selection box on mouse up
     setAppState(prev => ({ ...prev, selectionBox: null }));
-  }, [appState.selectedIcons, appState.openWindows, openWindow, focusWindow]);
+  }, []);
+
+  const handleIconDoubleClick = (iconId: string) => {
+    if (appState.openWindows.has(iconId)) {
+      focusWindow(iconId);
+    } else {
+      openWindow(iconId);
+    }
+  };
 
   const handleDesktopMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     // Prevent starting selection when clicking on other elements like icons or windows
@@ -483,6 +472,7 @@ const ClassicMacDesktop: React.FC = () => {
               icon={icon.icon}
               position={appState.iconPositions[icon.id]}
               onDragStart={(e) => handleIconDragStart(icon.id, e)}
+              onDoubleClick={() => handleIconDoubleClick(icon.id)}
               isSelected={appState.selectedIcons.has(icon.id)}
             />
           ))}

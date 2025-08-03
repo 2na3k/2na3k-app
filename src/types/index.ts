@@ -21,6 +21,7 @@ export interface DesktopIconProps {
   title: string;
   icon: string;
   onClick?: () => void;
+  onDoubleClick?: () => void;
   position: { x: number; y: number };
   onDragStart: (_e: React.MouseEvent) => void;
   isSelected: boolean;

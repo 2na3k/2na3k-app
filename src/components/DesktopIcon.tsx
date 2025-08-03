@@ -5,6 +5,7 @@ const DesktopIcon: React.FC<DesktopIconProps> = ({
   title, 
   icon, 
   onClick, 
+  onDoubleClick,
   position, 
   onDragStart,
   isSelected
@@ -20,8 +21,9 @@ const DesktopIcon: React.FC<DesktopIconProps> = ({
       }}
       onMouseDown={onDragStart}
       onClick={onClick}
+      onDoubleClick={onDoubleClick}
     >
-          <img src={icon} alt="About" className="w-12 h-12 justify-center pointer-events-none object-contain" />
+          <img src={icon} alt={title} className="w-12 h-12 justify-center pointer-events-none object-contain" />
           <span className="text-xs text-center font-bold text-black max-w-20 truncate pointer-events-none">
             {title}
           </span>
