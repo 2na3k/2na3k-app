@@ -9,6 +9,8 @@ import ContactContent from './components/ContactContent';
 import ImagePreviewContent from './components/ImagePreviewContent';
 import onTheCover from './static/images/on-the-cover.jpg';
 import { AppState, DragState, DesktopIcon as DesktopIconType } from './types';
+import PdfPreviewContent from './components/PdfPreviewContent';
+import cvIcon from './static/icons/cv.png';
 
 const ClassicMacDesktop: React.FC = () => {
   const [appState, setAppState] = useState<AppState>({
@@ -18,19 +20,22 @@ const ClassicMacDesktop: React.FC = () => {
       about: { x: 100, y: 100 },
       projects: { x: 150, y: 150 },
       contacts: { x: 200, y: 200 },
-      "on-the-cover": { x: 250, y: 250 }
+      "on-the-cover": { x: 250, y: 250 },
+      "cv": { x: 300, y: 300 }
     },
     windowSizes: {
       about: { width: 500, height: 400 },
       projects: { width: 550, height: 450 },
       contacts: { width: 500, height: 350 },
-      "on-the-cover": { width: 600, height: 500 }
+      "on-the-cover": { width: 600, height: 500 },
+      "cv": { width: 600, height: 700 }
     },
     iconPositions: {
       about: { x: 0, y: 0 },
       projects: { x: 0, y: 0 },
       contacts: { x: 0, y: 0 },
-      "on-the-cover": { x: 0, y: 0 }
+      "on-the-cover": { x: 0, y: 0 },
+      "cv": { x: 0, y: 0 }
     },
     focusedWindow: null,
     selectionBox: null,
@@ -71,7 +76,8 @@ const ClassicMacDesktop: React.FC = () => {
             about: { x: newX, y: 50 },
             projects: { x: newX, y: 150 },
             contacts: { x: newX, y: 250 },
-            "on-the-cover": { x: newX, y: 350 }
+            "on-the-cover": { x: newX, y: 350 },
+            cv: { x: newX, y: 450 }
           }
         }));
       }
@@ -118,6 +124,11 @@ const ClassicMacDesktop: React.FC = () => {
       id: 'on-the-cover',
       title: 'cover.jpg',
       icon: onTheCover
+    },
+    {
+      id: 'cv',
+      title: 'cv.pdf',
+      icon: cvIcon
     }
   ];
 
@@ -565,6 +576,23 @@ const ClassicMacDesktop: React.FC = () => {
           onResizeStart={(e, direction) => handleWindowResizeStart('on-the-cover', direction, e)}
         >
           <ImagePreviewContent />
+        </DesktopWindow>
+
+        <DesktopWindow
+          id="cv"
+          title="cv.pdf"
+          isOpen={appState.openWindows.has('cv')}
+          isFocused={appState.focusedWindow === 'cv'}
+          isDragging={dragState.isDragging && dragState.itemId === 'cv'}
+          isResizing={dragState.isResizing && dragState.itemId === 'cv'}
+          onClose={() => closeWindow('cv')}
+          onFocus={() => focusWindow('cv')}
+          position={appState.windowPositions.cv}
+          size={appState.windowSizes.cv}
+          onDragStart={(e) => handleWindowDragStart('cv', e)}
+          onResizeStart={(e, direction) => handleWindowResizeStart('cv', direction, e)}
+        >
+          <PdfPreviewContent />
         </DesktopWindow>
 
 
