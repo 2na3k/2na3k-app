@@ -6,6 +6,8 @@ import DesktopWindow from './components/Window';
 import AboutContent from './components/AboutContent';
 import ProjectsContent from './components/ProjectsContent';
 import ContactContent from './components/ContactContent';
+import ImagePreviewContent from './components/ImagePreviewContent';
+import onTheCover from './static/images/on-the-cover.jpg';
 import { AppState, DragState, DesktopIcon as DesktopIconType } from './types';
 
 const ClassicMacDesktop: React.FC = () => {
@@ -15,17 +17,20 @@ const ClassicMacDesktop: React.FC = () => {
     windowPositions: {
       about: { x: 100, y: 100 },
       projects: { x: 150, y: 150 },
-      contacts: { x: 200, y: 200 }
+      contacts: { x: 200, y: 200 },
+      "on-the-cover": { x: 250, y: 250 }
     },
     windowSizes: {
-      about: { width: 400, height: 300 },
-      projects: { width: 450, height: 350 },
-      contacts: { width: 400, height: 250 }
+      about: { width: 500, height: 400 },
+      projects: { width: 550, height: 450 },
+      contacts: { width: 500, height: 350 },
+      "on-the-cover": { width: 600, height: 500 }
     },
     iconPositions: {
-      about: { x: 50, y: 50 },
-      projects: { x: 50, y: 150 },
-      contacts: { x: 50, y: 250 }
+      about: { x: 0, y: 0 },
+      projects: { x: 0, y: 0 },
+      contacts: { x: 0, y: 0 },
+      "on-the-cover": { x: 0, y: 0 }
     },
     focusedWindow: null,
     selectionBox: null,
@@ -53,21 +58,31 @@ const ClassicMacDesktop: React.FC = () => {
   }, [dragState]);
 
   useEffect(() => {
-    if (desktopRef.current) {
-      const desktopWidth = desktopRef.current.clientWidth;
-      const iconWidth = 80;
-      const paddingRight = 20;
-      const newX = desktopWidth - iconWidth - paddingRight;
-      
-      setAppState(prev => ({
-        ...prev,
-        iconPositions: {
-          about: { x: newX, y: 50 },
-          projects: { x: newX, y: 150 },
-          contacts: { x: newX, y: 250 }
-        }
-      }));
-    }
+    const calculateIconPositions = () => {
+      if (desktopRef.current) {
+        const desktopWidth = desktopRef.current.clientWidth;
+        const iconWidth = 80;
+        const paddingRight = 20;
+        const newX = desktopWidth - iconWidth - paddingRight;
+        
+        setAppState(prev => ({
+          ...prev,
+          iconPositions: {
+            about: { x: newX, y: 50 },
+            projects: { x: newX, y: 150 },
+            contacts: { x: newX, y: 250 },
+            "on-the-cover": { x: newX, y: 350 }
+          }
+        }));
+      }
+    };
+
+    calculateIconPositions();
+
+    window.addEventListener('resize', calculateIconPositions);
+    return () => {
+      window.removeEventListener('resize', calculateIconPositions);
+    };
   }, []);
 
   // Desktop icons configuration
@@ -98,6 +113,11 @@ const ClassicMacDesktop: React.FC = () => {
       id: 'contacts',
       title: 'Contacts',
       icon: folderIcon
+    },
+    {
+      id: 'on-the-cover',
+      title: 'cover.jpg',
+      icon: onTheCover
     }
   ];
 
@@ -528,6 +548,23 @@ const ClassicMacDesktop: React.FC = () => {
           onResizeStart={(e, direction) => handleWindowResizeStart('contacts', direction, e)}
         >
           <ContactContent />
+        </DesktopWindow>
+
+        <DesktopWindow
+          id="on-the-cover"
+          title="cover.jpg"
+          isOpen={appState.openWindows.has('on-the-cover')}
+          isFocused={appState.focusedWindow === 'on-the-cover'}
+          isDragging={dragState.isDragging && dragState.itemId === 'on-the-cover'}
+          isResizing={dragState.isResizing && dragState.itemId === 'on-the-cover'}
+          onClose={() => closeWindow('on-the-cover')}
+          onFocus={() => focusWindow('on-the-cover')}
+          position={appState.windowPositions['on-the-cover']}
+          size={appState.windowSizes['on-the-cover']}
+          onDragStart={(e) => handleWindowDragStart('on-the-cover', e)}
+          onResizeStart={(e, direction) => handleWindowResizeStart('on-the-cover', direction, e)}
+        >
+          <ImagePreviewContent />
         </DesktopWindow>
 
 
