@@ -27,8 +27,8 @@ const ClassicMacDesktop: React.FC = () => {
       about: { width: 500, height: 400 },
       projects: { width: 550, height: 450 },
       contacts: { width: 500, height: 350 },
-      "on-the-cover": { width: 600, height: 500 },
-      "cv": { width: 600, height: 700 }
+      "on-the-cover": { width: 1500, height: 1000 },
+      "cv": { width: 1500, height: 1000 }
     },
     iconPositions: {
       about: { x: 0, y: 0 },
