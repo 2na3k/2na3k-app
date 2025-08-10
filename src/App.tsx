@@ -4,7 +4,8 @@ import folderIcon from './static/icons/folder.png';
 import DesktopIcon from './components/DesktopIcon';
 import DesktopWindow from './components/Window';
 import AboutContent from './components/AboutContent';
-import ProjectsContent from './components/ProjectsContent';
+import ProjectsWindow from './components/ProjectsWindow';
+import TextPreviewWindow from './components/TextPreviewWindow';
 import ContactContent from './components/ContactContent';
 import ImagePreviewContent from './components/ImagePreviewContent';
 import onTheCover from './static/images/on-the-cover.jpg';
@@ -21,14 +22,20 @@ const ClassicMacDesktop: React.FC = () => {
       projects: { x: 150, y: 150 },
       contacts: { x: 200, y: 200 },
       "on-the-cover": { x: 250, y: 250 },
-      "cv": { x: 300, y: 300 }
+      "cv": { x: 300, y: 300 },
+      project1: { x: 350, y: 350 },
+      project2: { x: 400, y: 400 },
+      project3: { x: 450, y: 450 }
     },
     windowSizes: {
       about: { width: 500, height: 400 },
       projects: { width: 550, height: 450 },
       contacts: { width: 500, height: 350 },
       "on-the-cover": { width: 1500, height: 1000 },
-      "cv": { width: 1500, height: 1000 }
+      "cv": { width: 1500, height: 1000 },
+      project1: { width: 400, height: 300 },
+      project2: { width: 400, height: 300 },
+      project3: { width: 400, height: 300 }
     },
     iconPositions: {
       about: { x: 0, y: 0 },
@@ -541,7 +548,7 @@ const ClassicMacDesktop: React.FC = () => {
           onDragStart={(e) => handleWindowDragStart('projects', e)}
           onResizeStart={(e, direction) => handleWindowResizeStart('projects', direction, e)}
         >
-          <ProjectsContent />
+          <ProjectsWindow onIconDoubleClick={handleIconDoubleClick} />
         </DesktopWindow>
 
         <DesktopWindow
@@ -595,7 +602,56 @@ const ClassicMacDesktop: React.FC = () => {
           <PdfPreviewContent />
         </DesktopWindow>
 
+        <DesktopWindow
+          id="project1"
+          title="Project 1"
+          isOpen={appState.openWindows.has('project1')}
+          isFocused={appState.focusedWindow === 'project1'}
+          isDragging={dragState.isDragging && dragState.itemId === 'project1'}
+          isResizing={dragState.isResizing && dragState.itemId === 'project1'}
+          onClose={() => closeWindow('project1')}
+          onFocus={() => focusWindow('project1')}
+          position={appState.windowPositions.project1}
+          size={appState.windowSizes.project1}
+          onDragStart={(e) => handleWindowDragStart('project1', e)}
+          onResizeStart={(e, direction) => handleWindowResizeStart('project1', direction, e)}
+        >
+          <TextPreviewWindow title="Project 1" content="This is the content for project 1." />
+        </DesktopWindow>
 
+        <DesktopWindow
+          id="project2"
+          title="Project 2"
+          isOpen={appState.openWindows.has('project2')}
+          isFocused={appState.focusedWindow === 'project2'}
+          isDragging={dragState.isDragging && dragState.itemId === 'project2'}
+          isResizing={dragState.isResizing && dragState.itemId === 'project2'}
+          onClose={() => closeWindow('project2')}
+          onFocus={() => focusWindow('project2')}
+          position={appState.windowPositions.project2}
+          size={appState.windowSizes.project2}
+          onDragStart={(e) => handleWindowDragStart('project2', e)}
+          onResizeStart={(e, direction) => handleWindowResizeStart('project2', direction, e)}
+        >
+          <TextPreviewWindow title="Project 2" content="This is the content for project 2." />
+        </DesktopWindow>
+
+        <DesktopWindow
+          id="project3"
+          title="Project 3"
+          isOpen={appState.openWindows.has('project3')}
+          isFocused={appState.focusedWindow === 'project3'}
+          isDragging={dragState.isDragging && dragState.itemId === 'project3'}
+          isResizing={dragState.isResizing && dragState.itemId === 'project3'}
+          onClose={() => closeWindow('project3')}
+          onFocus={() => focusWindow('project3')}
+          position={appState.windowPositions.project3}
+          size={appState.windowSizes.project3}
+          onDragStart={(e) => handleWindowDragStart('project3', e)}
+          onResizeStart={(e, direction) => handleWindowResizeStart('project3', direction, e)}
+        >
+          <TextPreviewWindow title="Project 3" content="This is the content for project 3." />
+        </DesktopWindow>
       </div>
     </div>
   );

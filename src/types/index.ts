@@ -17,7 +17,7 @@ export interface WindowProps {
 }
 
 export interface DesktopIconProps {
-  id: string;
+  id?: string;
   title: string;
   icon: string;
   onClick?: () => void;
