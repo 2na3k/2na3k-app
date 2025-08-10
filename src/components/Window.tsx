@@ -22,7 +22,7 @@ const DesktopWindow: React.FC<WindowProps> = ({
     <div
       className={`absolute bg-gray-100 dark:bg-gray-800 border-2 rounded-xl window-shadow ${!(isDragging || isResizing) ? 'transition-all duration-200' : ''} ${
         isFocused 
-          ? 'border-blue-500 dark:border-blue-400 shadow-lg' 
+          ? 'border-gray-700 dark:border-gray-500 shadow-lg' 
           : 'border-gray-400 dark:border-gray-600 filter grayscale'
       }`}
       style={{ 
@@ -40,7 +40,7 @@ const DesktopWindow: React.FC<WindowProps> = ({
       <div
         className={`px-4 py-2 rounded-t-md cursor-move flex items-center transition-colors duration-200 ${
           isFocused
-            ? 'bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 text-white'
+            ? 'bg-gradient-to-r from-gray-700 to-gray-800 dark:from-gray-600 dark:to-gray-700 text-white'
             : 'bg-gradient-to-r from-gray-400 to-gray-500 dark:from-gray-500 dark:to-gray-600 text-gray-800 dark:text-gray-300'
         }`}
         onMouseDown={(e) => {
