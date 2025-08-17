@@ -12,6 +12,7 @@ import onTheCover from './static/images/on-the-cover.jpg';
 import { AppState, DragState, DesktopIcon as DesktopIconType } from './types';
 import PdfPreviewContent from './components/PdfPreviewContent';
 import cvIcon from './static/icons/cv.png';
+import notionIcon from './static/icons/notion.png';
 
 const ClassicMacDesktop: React.FC = () => {
   const [appState, setAppState] = useState<AppState>({
@@ -42,7 +43,8 @@ const ClassicMacDesktop: React.FC = () => {
       projects: { x: 0, y: 0 },
       contacts: { x: 0, y: 0 },
       "on-the-cover": { x: 0, y: 0 },
-      "cv": { x: 0, y: 0 }
+      "cv": { x: 0, y: 0 },
+      "blog": { x: 0, y: 0 }
     },
     focusedWindow: null,
     selectionBox: null,
@@ -84,7 +86,8 @@ const ClassicMacDesktop: React.FC = () => {
             projects: { x: newX, y: 150 },
             contacts: { x: newX, y: 250 },
             "on-the-cover": { x: newX, y: 350 },
-            cv: { x: newX, y: 450 }
+            cv: { x: newX, y: 450 },
+            blog: { x: newX, y: 550 }
           }
         }));
       }
@@ -136,6 +139,11 @@ const ClassicMacDesktop: React.FC = () => {
       id: 'cv',
       title: 'cv.pdf',
       icon: cvIcon
+    },
+    {
+      id: 'blog',
+      title: 'Blog',
+      icon: notionIcon
     }
   ];
 
@@ -420,6 +428,10 @@ const ClassicMacDesktop: React.FC = () => {
   }, []);
 
   const handleIconDoubleClick = (iconId: string) => {
+    if (iconId === 'blog') {
+      window.open('https://thanhaslarry.notion.site/le-s-blog-technical-ones-2520bcd9ac5780fe9042efee51243859', '_blank');
+      return;
+    }
     if (appState.openWindows.has(iconId)) {
       focusWindow(iconId);
     } else {
